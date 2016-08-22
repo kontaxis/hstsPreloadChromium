@@ -4,4 +4,4 @@
 URL="https://chromium.googlesource.com/chromium/src/net/+/master/http/transport_security_state_static.json?format=TEXT"
 
 curl -L "${URL}" | base64 --decode |
-	egrep -v "^([ ]*\/\/|$)" > "chromium_hsts_list.dat";
+	egrep -v "^([ ]*\/\/|$)" > "transport_security_state_static";

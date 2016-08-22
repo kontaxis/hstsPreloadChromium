@@ -29,6 +29,7 @@ class hstsPreloadChromium:
 
 	def __init__(self, dbPath):
 		conn = sqlite3.connect(dbpath)
+		conn.row_factory = sqlite3.Row
 		conn.text_factory = str
 		self._dbConnCursor = conn.cursor()
 
@@ -38,16 +39,18 @@ class hstsPreloadChromium:
 		for hostname in entries:
 			self.verbose and print("hsts '%s' : " % hostname, end="")
 
-			self._dbConnCursor.execute('SELECT domain from hsts where domain=?',
+			self._dbConnCursor.execute('SELECT name,mode from entries where name=?',
 				(hostname,))
 			match = self._dbConnCursor.fetchone()
 			if match:
+				self.verbose and print("HIT")
+				if match["mode"] != "force-https":
+					continue
 				hits.append(hostname)
-				self.verbose and print("TRUE")
 				continue
 
 			# Lookup was a miss.
-			self.verbose and print("FALSE")
+			self.verbose and print("MISS")
 
 			# Look for ever shorter wildcards.
 			labels = hostname.strip(".").split(".")
@@ -57,16 +60,18 @@ class hstsPreloadChromium:
 
 				self.verbose and print("hsts '%s' : " % hsts_wild, end="")
 
-				self._dbConnCursor.execute('SELECT domain from hsts where domain=?',
+				self._dbConnCursor.execute('SELECT name,mode from entries where name=?',
 					(hsts_wild,))
 				match = self._dbConnCursor.fetchone()
 				if match:
+					self.verbose and print("HIT")
+					if match["mode"] != "force-https":
+						break
 					hits.append(hostname)
-					self.verbose and print("TRUE")
 					break
 
 				# Wildcard lookup was a miss.
-				self.verbose and print("FALSE")
+				self.verbose and print("MISS")
 
 		return hits
 
