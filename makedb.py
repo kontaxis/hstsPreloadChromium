@@ -1,4 +1,4 @@
-#!/usr/bin/python -u
+#!/usr/bin/python3 -u
 
 # kontaxis 2015-11-03
 
@@ -18,7 +18,7 @@ dirname = os.path.dirname(sys.argv[0])
 # Populate entries array
 entries = []
 
-f = file(os.path.join(dirname, "transport_security_state_static"), "r")
+f = open(os.path.join(dirname, "transport_security_state_static"), "r")
 j = json.loads(f.read())
 f.close()
 
